@@ -1,0 +1,43 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./OrbitalVault:/srv/orbitalvault:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - 10kgraph-website
+    networks:
+      - web
+
+  10kgraph-website:
+    build:
+      context: ./10KGraph
+      args:
+        NEXT_PUBLIC_SHEETS_WEBHOOK_URL: ${NEXT_PUBLIC_SHEETS_WEBHOOK_URL:-}
+    image: 10kgraph-website:latest
+    container_name: 10kgraph-website
+    restart: unless-stopped
+    env_file:
+      - ./10KGraph/.env
+    environment:
+      NODE_ENV: production
+    expose:
+      - "3000"
+    networks:
+      - web
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  web:
+    driver: bridge

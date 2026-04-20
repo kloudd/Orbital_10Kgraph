@@ -1,0 +1,10 @@
+orbitalvault.site, www.orbitalvault.site {
+	encode gzip zstd
+	root * /srv/orbitalvault
+	file_server
+}
+
+10kgraph.com, www.10kgraph.com {
+	encode gzip zstd
+	reverse_proxy 10kgraph-website:3000
+}
